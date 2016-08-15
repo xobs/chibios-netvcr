@@ -124,6 +124,7 @@ CSRC = $(STARTUPSRC) \
        main.c \
        orchard-vectors.c \
        orchard-shell.c \
+       program-dumb-rle.c \
        gitversion.c \
        $(CHIBIOS)/os/hal/lib/streams/chprintf.c \
        $(CHIBIOS)/os/hal/lib/streams/memstreams.c \
