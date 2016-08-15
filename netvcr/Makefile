@@ -227,7 +227,7 @@ UINCDIR =
 ULIBDIR =
 
 # List all user libraries here
-ULIBS =
+ULIBS = lib/armv6-m-libgcc.a lib/libc-nano-armv6-m.a
 
 #
 # End of user defines
