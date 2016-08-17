@@ -30,3 +30,7 @@
 
 # Debug files
 *.dSYM/
+
+# Git revision data
+gitversion.c
+gitversion.h
