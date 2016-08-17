@@ -36,6 +36,8 @@ static const EXTConfig extcfg = {
   }
 };
 
+extern void programDumbRleFile(void);
+
 /*
  * Application entry point.
  */
@@ -75,6 +77,8 @@ int main(void) {
    */
   palSetPadMode(IOPORT3, 2, PAL_MODE_INPUT_PULLUP);  // FPGA done
   extStart(&EXTD1, &extcfg);
+
+  programDumbRleFile();
 
 #if 0
   update_html_file();
