@@ -7,7 +7,7 @@
 #define SPIDEV &SPID1
 
 const uint8_t dumb_rle_file[] =
-    #include "hdmi_phy_test1_wrapper.bin.rle.h"
+    #include "fpga_bitstream.h"
 ;
 
 #define STATE_ZEROES 0
