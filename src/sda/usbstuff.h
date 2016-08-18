@@ -1,0 +1,21 @@
+#ifndef __USB_STUFF_H__
+#define __USB_STUFF_H__
+
+#define MSC_TASK_STACK      (200)
+
+typedef enum {
+    USB_IDLE,
+    USB_ACTIVE
+} USB_BUSY;
+
+typedef enum {
+    USB_DISCONNECTED,
+    USB_CONNECTING,
+    USB_CONNECTED,
+    USB_CHECK_CONNECTED,
+    USB_CONFIGURED,
+    USB_DISCONNECTING,
+    USB_DISCONNECT_CONNECT
+} USB_CONNECT;
+
+#endif /* USB_STUFF */

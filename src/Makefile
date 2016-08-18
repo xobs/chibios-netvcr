@@ -108,12 +108,16 @@ include $(CHIBIOS)/os/various/shell/shell.mk
 LDSCRIPT= ../ld/MK20DX128.ld
 
 #cruft from CMSIS-DAP openSDA
-#OPENSDA = $(CHIBIOS)/$(PROJECT)/opensda
+#OPENSDA = opensda
 #include $(OPENSDA)/build.mk
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CSRC = $(STARTUPSRC) \
+CSRC = \
+       sda/usbd_user_msc.c \
+       sda/usbd_msc.c \
+       sda/usb_lib.c \
+       $(STARTUPSRC) \
        $(KERNSRC) \
        $(PORTSRC) \
        $(OSALSRC) \
@@ -129,8 +133,6 @@ CSRC = $(STARTUPSRC) \
        program-dumb-rle.c \
        gitversion.c \
        $(wildcard cmd-*.c) \
-       $(LIBC90TFSSRC) \
-#       $(OPENSDASRC) \
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -163,7 +165,8 @@ ASMXSRC = $(STARTUPASM) $(PORTASM) $(OSALASM)
 INCDIR = $(CHIBIOS)/os/license \
          $(STARTUPINC) $(KERNINC) $(PORTINC) $(OSALINC) \
          $(HALINC) $(PLATFORMINC) $(BOARDINC) $(TESTINC) \
-         $(STREAMSINC) $(SHELLINC)
+         $(STREAMSINC) $(SHELLINC) \
+         -Isda
 
 #
 # Project, sources and paths
