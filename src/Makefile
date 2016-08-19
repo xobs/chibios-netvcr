@@ -114,9 +114,7 @@ LDSCRIPT= ../ld/MK20DX128.ld
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
 CSRC = \
-       sda/usbd_user_msc.c \
-       sda/usbd_msc.c \
-       sda/usb_lib.c \
+       usbcfg.c \
        $(STARTUPSRC) \
        $(KERNSRC) \
        $(PORTSRC) \
@@ -133,6 +131,10 @@ CSRC = \
        program-dumb-rle.c \
        gitversion.c \
        $(wildcard cmd-*.c) \
+
+#       sda/usbd_user_msc.c
+#       sda/usbd_msc.c
+#       sda/usb_lib.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.

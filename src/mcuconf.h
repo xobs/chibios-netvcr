@@ -121,4 +121,10 @@
 #define KINETIS_EXT_PORTE_WIDTH                 13
 #endif
 
+/*
+ * USB driver system settings.
+ */
+#define KINETIS_USB_USE_USB0                TRUE
+#define KINETIS_USB_USB0_IRQ_PRIORITY       5
+
 #endif /* _MCUCONF_H_ */

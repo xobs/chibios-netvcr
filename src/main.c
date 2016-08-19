@@ -14,12 +14,14 @@
     limitations under the License.
 */
 
-#include "ch.h"
 #include "hal.h"
 
-#include "printf.h"
-#include "orchard.h"
-#include "orchard-shell.h"
+#include "chprintf.h"
+#include "shell.h"
+
+#include "usbcfg.h"
+
+extern const char *gitversion;
 
 static uint8_t done_state = 0;
 /* Triggered when done goes low, white LED stops flashing */
@@ -38,6 +40,23 @@ static const EXTConfig extcfg = {
 
 extern void programDumbRleFile(void);
 
+/*===========================================================================*/
+/* Command line related.                                                     */
+/*===========================================================================*/
+
+#define SHELL_WA_SIZE   THD_WORKING_AREA_SIZE(2048)
+
+#define stream (BaseSequentialStream *)&SDU1
+
+static const ShellCommand commands[] = {
+  {NULL, NULL}
+};
+
+static const ShellConfig shell_cfg1 = {
+  stream,
+  commands
+};
+
 /*
  * Application entry point.
  */
@@ -53,7 +72,23 @@ int main(void) {
   halInit();
   chSysInit();
 
-  orchardShellInit();
+  shellInit();
+
+  /*
+   * Initializes a serial-over-USB CDC driver.
+   */
+  sduObjectInit(&SDU1);
+  sduStart(&SDU1, &serusbcfg);
+
+  /*
+   * Activates the USB driver and then the USB bus pull-up on D+.
+   * Note, a delay is inserted in order to not have to disconnect the cable
+   * after a reset.
+   */
+  usbDisconnectBus(serusbcfg.usbp);
+  chThdSleepMilliseconds(1000);
+  usbStart(serusbcfg.usbp, &usbcfg);
+  usbConnectBus(serusbcfg.usbp);
 
   chprintf(stream, "\r\n\r\nNeTVCR bootloader.  Based on build %s\r\n", gitversion);
   chprintf(stream, "Core free memory : %d bytes\r\n", chCoreGetStatusX());
@@ -62,9 +97,7 @@ int main(void) {
   palClearPad(IOPORT1, 4);    // white LED, active low
   palClearPad(IOPORT3, 3);    // MCU_F_MODE, set to 0, specifies SPI mode. Clear to 0 for SPI.
   palSetPad(IOPORT2, 0);    // FPGA_DRIVE, normally enable FPGA to drive the SPI bus
-  //  palSetPad(IOPORT2, 1);    // MCU_F_INIT initially an input, don't stall configuration
   palSetPad(IOPORT3, 1);    // MCU_F_PROG, set PROG high, pulse low to reset the FPGA
-
 
   // pulse PROG now that the Mode pin has been setup
   chThdSleepMilliseconds(1);
@@ -78,7 +111,7 @@ int main(void) {
   palSetPadMode(IOPORT3, 2, PAL_MODE_INPUT_PULLUP);  // FPGA done
   extStart(&EXTD1, &extcfg);
 
-  programDumbRleFile();
+  //programDumbRleFile();
 
 #if 0
   update_html_file();
@@ -92,7 +125,21 @@ int main(void) {
   
   //  usbd_connect(__FALSE);
 #endif
-  
+
+
+  /*
+   * Normal main() thread activity, spawning shells.
+   */
+  while (true) {
+    if (SDU1.config->usbp->state == USB_ACTIVE) {
+      thread_t *shelltp = chThdCreateFromHeap(NULL, SHELL_WA_SIZE,
+                                              "shell", NORMALPRIO + 1,
+                                              shellThread, (void *)&shell_cfg1);
+      chThdWait(shelltp);               /* Waiting termination.             */
+    }
+    chThdSleepMilliseconds(1000);
+  }
+
   while (1) {
     chThdSleepMilliseconds(500);
     if( done_state )
