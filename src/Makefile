@@ -25,7 +25,7 @@ endif
 
 # Linker extra options here.
 ifeq ($(USE_LDOPT),)
-  USE_LDOPT = 
+  USE_LDOPT =
 endif
 
 # Enable this if you want link time optimizations (LTO)
@@ -88,6 +88,8 @@ PROJECT = netvcr
 # Imported source files and paths
 CHIBIOS = ../ChibiOS
 CHIBIOS_CONTRIB = ../ChibiOS-Contrib
+NETVSRC = ..
+
 # Startup files.
 include $(CHIBIOS_CONTRIB)/os/common/startup/ARMCMx/compilers/GCC/mk/startup_k20x5.mk
 # HAL-OSAL files (optional).
@@ -240,9 +242,9 @@ ULIBS = lib/armv6-m-libgcc.a lib/libc-nano-armv6-m.a
 RULESPATH = $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC
 include $(RULESPATH)/rules.mk
 
-gitversion.c: $(CHIBIOS)/.git/HEAD $(CHIBIOS)/.git/index
+gitversion.c: $(NETVSRC)/.git/HEAD $(NETVSRC)/.git/index
 	echo "const char *gitversion = \"$(shell git rev-parse HEAD)\";" > $@
 
-gitversion.h: $(CHIBIOS)/.git/HEAD $(CHIBIOS)/.git/index
+gitversion.h: $(NETVSRC)/.git/HEAD $(NETVSRC)/.git/index
 	echo "#define GIT_COMMIT_SHA \"$(shell git rev-parse HEAD)\"" > $@
 
