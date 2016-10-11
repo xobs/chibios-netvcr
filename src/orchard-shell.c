@@ -51,7 +51,7 @@ void orchardShellRestart(void)
 
   shellConfig.sc_channel = stream_driver;
   shellConfig.sc_commands = shellCommands;
-  
+
   /* Recovers memory of the previous shell. */
   if (shell_tp && chThdTerminatedX(shell_tp))
     chThdRelease(shell_tp);
