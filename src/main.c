@@ -112,12 +112,6 @@ int main(void) {
     }
     chThdSleepMilliseconds(1000);
   }
-
-  while (1) {
-    chThdSleepMilliseconds(500);
-    if (done_state)
-      palTogglePad(IOPORT1, 4);
-  }
 }
 
 /* TAR settings for n bits at SYSCLK / 4 */
