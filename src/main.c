@@ -83,9 +83,6 @@ int main(void) {
   usbStart(serusbcfg.usbp, &usbcfg);
   usbConnectBus(serusbcfg.usbp);
 
-  chprintf(stream, "\r\n\r\nNeTVCR bootloader.  Based on build %s\r\n", gitversion);
-  chprintf(stream, "Core free memory : %d bytes\r\n", chCoreGetStatusX());
-
   // IOPORT1 = PORTA, IOPORT2 = PORTB, etc...
   palClearPad(IOPORT1, 4);    // white LED, active low
   palClearPad(IOPORT3, 3);    // MCU_F_MODE, set to 0, specifies SPI mode. Clear to 0 for SPI.
@@ -100,6 +97,14 @@ int main(void) {
    */
   while (true) {
     if (SDU1.config->usbp->state == USB_ACTIVE) {
+      /* Slight delay to wait for CDC to attach */
+      osalThreadSleepMilliseconds(100);
+      chprintf(stream, SHELL_NEWLINE_STR SHELL_NEWLINE_STR);
+      chprintf(stream, "NeTVCR bootloader.  Based on build %s"SHELL_NEWLINE_STR,
+               gitversion);
+      chprintf(stream, "Core free memory : %d bytes"SHELL_NEWLINE_STR,
+               chCoreGetStatusX());
+
       thread_t *shelltp = chThdCreateFromHeap(NULL, SHELL_WA_SIZE,
                                               "shell", NORMALPRIO + 1,
                                               shellThread, (void *)&shell_cfg);
