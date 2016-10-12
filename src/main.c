@@ -115,13 +115,26 @@ int main(void) {
   }
 }
 
+/* TAR settings for n bits at SYSCLK / 4 */
+#define KINETIS_SPI_TAR_SYSCLK_DIV_4(n)\
+      SPIx_CTARn_FMSZ((n) - 1) | \
+    SPIx_CTARn_CPOL | \
+    SPIx_CTARn_CPHA | \
+    SPIx_CTARn_DBR | \
+    SPIx_CTARn_PBR(0) | \
+    SPIx_CTARn_BR(0x1) | \
+    SPIx_CTARn_CSSCK(0x1) | \
+    SPIx_CTARn_ASC(0x1) | \
+    SPIx_CTARn_DT(0x1)
+#define KINETIS_SPI_TAR_8BIT_NOT_AS_FAST   KINETIS_SPI_TAR_SYSCLK_DIV_4(8)
+
 void spiConfigure(SPIDriver *spip) {
   static const SPIConfig spinor_config = {
     NULL,
     /* HW dependent part.*/
     GPIOC,
     4,
-    KINETIS_SPI_TAR_8BIT_SLOW
+    KINETIS_SPI_TAR_8BIT_NOT_AS_FAST
   };
 
   palSetPadMode(IOPORT2, 0, PAL_MODE_OUTPUT_PUSHPULL); // FPGA_DRIVE, send it low
