@@ -1,6 +1,6 @@
 #include "hal.h"
 
-#define MAX_RETRIES 3000
+#define FPGA_TIMEOUT MS2ST(500)
 
 int fpgaProgrammed(void)
 {
@@ -29,13 +29,13 @@ int fpgaConnect(void)
   chThdSleepMicroseconds(50);
   palSetPad(IOPORT3, 1); // MCU_F_PROG
 
-  int get_status_tries = 0;
-  while (!fpgaProgrammed() && (get_status_tries < MAX_RETRIES)) {
-    get_status_tries++;
-    chThdSleepMilliseconds(1);
+  int start_time = chVTGetSystemTimeX();
+  int sleep_msecs = 1;
+  while (!fpgaProgrammed()) {
+    if (chVTTimeElapsedSinceX(start_time) > FPGA_TIMEOUT)
+      return MSG_TIMEOUT;
+    chThdSleepMilliseconds(sleep_msecs += 5);
   }
-  if (get_status_tries >= MAX_RETRIES)
-    return 1;
 
   palClearPad(IOPORT1, 4); // LED on
   return 0;
