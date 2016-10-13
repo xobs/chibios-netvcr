@@ -103,6 +103,12 @@ out:
   else
     chprintf(chp, "Ok"SHELL_NEWLINE_STR);
 
+  chprintf(chp, "Resetting FPGA: ");
+  if (fpgaReset())
+    chprintf(chp, "Error"SHELL_NEWLINE_STR);
+  else
+    chprintf(chp, "Ok"SHELL_NEWLINE_STR);
+
   /* 5. MCU re-connects FPGA by asserting FPGA_DRIVE */
   chprintf(chp, "Reconnecting FPGA: ");
   if (fpgaConnect())
