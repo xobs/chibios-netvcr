@@ -1,12 +1,21 @@
 #include "hal.h"
 #include "fpga.h"
 
-#define FPGA_TIMEOUT MS2ST(8000)
-
 int fpgaProgrammed(void)
 {
 
   return palReadPad(IOPORT3, 2);
+}
+
+int fpgaWaitUntilProgrammed(uint32_t max_ticks)
+{
+  /* Wait for it to program itself */
+  int start_time = chVTGetSystemTimeX();
+  while (!fpgaProgrammed()) {
+    if (chVTTimeElapsedSinceX(start_time) > max_ticks)
+      return MSG_TIMEOUT;
+  }
+  return 0;
 }
 
 int fpgaConnect(void)
@@ -28,13 +37,6 @@ int fpgaConnect(void)
 
   /* Un-reset the FPGA */
   fpgaUnreset();
-
-  /* Wait for it to program itself */
-  int start_time = chVTGetSystemTimeX();
-  while (!fpgaProgrammed()) {
-    if (chVTTimeElapsedSinceX(start_time) > FPGA_TIMEOUT)
-      return MSG_TIMEOUT;
-  }
 
   palClearPad(IOPORT1, 4); // LED on
   return 0;
