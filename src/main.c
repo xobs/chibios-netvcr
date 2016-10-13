@@ -104,28 +104,12 @@ int main(void) {
   palClearPad(IOPORT3, 1);    // MCU_F_PROG, set PROG high, pulse low to reset the FPGA (min width = 250ns)
   chThdSleepMilliseconds(1);
   palSetPad(IOPORT3, 1);
-  
+
   /*
    * Activates the EXT driver 1.
    */
   palSetPadMode(IOPORT3, 2, PAL_MODE_INPUT_PULLUP);  // FPGA done
   extStart(&EXTD1, &extcfg);
-
-  //programDumbRleFile();
-
-#if 0
-  update_html_file();
-
-  //  usbd_init();
-  //  usbd_connect(__TRUE);
-
-  //  os_evt_wait_or(TRANSFER_FINISHED_SUCCESS | TRANSFER_FINISHED_FAIL, NO_TIMEOUT);
-
-  //  os_dly_wait(200);
-  
-  //  usbd_connect(__FALSE);
-#endif
-
 
   /*
    * Normal main() thread activity, spawning shells.
@@ -142,7 +126,7 @@ int main(void) {
 
   while (1) {
     chThdSleepMilliseconds(500);
-    if( done_state )
+    if (done_state)
       palTogglePad(IOPORT1, 4);
   }
 }
