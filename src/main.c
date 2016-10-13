@@ -99,8 +99,12 @@ int main(void) {
    */
   while (true) {
     if (SDU1.config->usbp->state == USB_ACTIVE) {
-      /* Slight delay to wait for CDC to attach */
-      osalThreadSleepMilliseconds(500);
+      /* Wait for the user to send a keystroke */
+      {
+        uint8_t dummy;
+        streamRead(stream, &dummy, 1);
+      }
+
       chprintf(stream, SHELL_NEWLINE_STR SHELL_NEWLINE_STR);
       chprintf(stream, "NeTVCR bootloader.  Based on build %s"SHELL_NEWLINE_STR,
                gitversion);
