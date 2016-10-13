@@ -70,7 +70,7 @@ uint32_t spinorReadDeviceIdType(SPIDriver *spip, uint8_t id)
   return val;
 }
 
-void spinorEnableWrite(SPIDriver *spip)
+int spinorEnableWrite(SPIDriver *spip)
 {
   /*
   uint8_t seq[2] = {0x01, 0x03};
@@ -88,9 +88,11 @@ void spinorEnableWrite(SPIDriver *spip)
   /* Wait for "Write Enable Latch" to go high */
   while (!(spinorGetStatus(spip) & 0x02))
     chThdSleepMicroseconds(50);
+
+  return 0;
 }
 
-void spinorDisableWrite(SPIDriver *spip)
+int spinorDisableWrite(SPIDriver *spip)
 {
   uint8_t byte = 0x04;
   spiSelect(spip);
@@ -98,11 +100,13 @@ void spinorDisableWrite(SPIDriver *spip)
   spiUnselect(spip);
 
   /* Wait for "Write Enable Latch" to go low */
-  while (spinorGetStatus(spip) & 0x02);
+  while (spinorGetStatus(spip) & 0x02)
+    ;
+
+  return 0;
 }
 
-int msecs;
-void spinorEraseChip(SPIDriver *spip)
+int spinorEraseChip(SPIDriver *spip)
 {
   uint8_t byte = 0xc7;
 
@@ -114,13 +118,15 @@ void spinorEraseChip(SPIDriver *spip)
   chThdSleepMicroseconds(50);
 
   /* Wait for "Write In Progress" to go low */
-  msecs = 500;
+  int msecs = 500;
   while (spinorGetStatus(spip) & 0x01) {
     chThdSleepMilliseconds(msecs += 10);
   }
+
+  return 0;
 }
 
-void spinorErasePage(SPIDriver *spip, int page)
+int spinorErasePage(SPIDriver *spip, int page)
 {
 
   uint8_t buffer[4];
@@ -128,7 +134,7 @@ void spinorErasePage(SPIDriver *spip, int page)
   // Pages are erased on sector / block boundaries, and there are
   // 16 pages per sector.
   if ((page & 0xf) != 0)
-    return;
+    return -1;
 
   buffer[0] = 0x20;
   buffer[1] = page >> 8;
@@ -145,10 +151,12 @@ void spinorErasePage(SPIDriver *spip, int page)
   /* Wait for "Write In Progress" to go low */
   while (spinorGetStatus(spip) & 0x01)
     chThdSleepMicroseconds(50);
+
+  return 0;
 }
 
-void spinorProgramPage(SPIDriver *spip, int page,
-                       size_t count, const void *data)
+int spinorProgramPage(SPIDriver *spip, int page,
+                      size_t count, const void *data)
 {
   uint8_t buffer[count + 4];
 
@@ -168,4 +176,6 @@ void spinorProgramPage(SPIDriver *spip, int page,
   /* Wait for "Write In Progress" to go low */
   while (spinorGetStatus(spip) & 0x01)
     chThdSleepMicroseconds(50);
+
+  return 0;
 }
