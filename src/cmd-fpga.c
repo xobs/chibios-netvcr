@@ -37,6 +37,11 @@ void fpgaCommand(BaseSequentialStream *chp, int argc, char *argv[])
       return;
     }
 
+    if (fpgaWaitUntilProgrammed(MS2ST(8000))) {
+      chprintf(chp, "FPGA never programmed"SHELL_NEWLINE_STR);
+      return;
+    }
+
     chprintf(chp, "Ok"SHELL_NEWLINE_STR);
   }
 
