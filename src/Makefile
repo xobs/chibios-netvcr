@@ -129,7 +129,7 @@ CSRC = \
        main.c \
        orchard-vectors.c \
        shellcfg.c \
-       uploader.c \
+       xmodem.c \
        fpga.c \
        spinor.c \
        gitversion.c \
