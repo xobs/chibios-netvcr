@@ -45,10 +45,12 @@ char *completion_buffer[SHELL_MAX_COMPLETIONS];
  */
 void handleUpload(BaseSequentialStream *chp, int argc, char *argv[]);
 void spinorCommand(BaseSequentialStream *chp, int argc, char *argv[]);
+void fpgaCommand(BaseSequentialStream *chp, int argc, char *argv[]);
 
 static const ShellCommand commands[] = {
-  {"upload", handleUpload},
+  {"fpga", fpgaCommand},
   {"spinor", spinorCommand},
+  {"upload", handleUpload},
   {NULL, NULL}
 };
 
