@@ -138,8 +138,9 @@ int spiConfigure(SPIDriver *spip) {
     KINETIS_SPI_TAR_8BIT_NOT_AS_FAST
   };
 
-  palSetPadMode(IOPORT2, 0, PAL_MODE_OUTPUT_PUSHPULL); // FPGA_DRIVE, send it low
-  palSetPad(IOPORT2, 0);                               // FPGA_DRIVE, normally enable FPGA to drive the SPI bus
+  // FPGA_DRIVE, send it low, switching bus from FPGA to us
+  palSetPadMode(IOPORT2, 0, PAL_MODE_OUTPUT_PUSHPULL);
+  palClearPad(IOPORT2, 0);
 
 #warning "Figure out why we need this, and why PCS doesn't work."
   palSetPadMode(IOPORT3, 4, PAL_MODE_OUTPUT_PUSHPULL);
