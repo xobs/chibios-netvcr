@@ -26,9 +26,7 @@ int fpgaConnect(void)
   /* Let things float */
   chThdSleepMilliseconds(1);
 
-  /* Reset (then un-reset) the FPGA */
-  fpgaReset();
-  chThdSleepMicroseconds(50);
+  /* Un-reset the FPGA */
   fpgaUnreset();
 
   /* Wait for it to program itself */
@@ -54,14 +52,14 @@ int fpgaDisconnect(void)
 
 int fpgaReset(void)
 {
-  palSetPadMode(IOPORT3, 1, PAL_MODE_OUTPUT_PUSHPULL);
   palClearPad(IOPORT3, 1); // MCU_F_PROG
+  palSetPadMode(IOPORT3, 1, PAL_MODE_OUTPUT_PUSHPULL);
   return 0;
 }
 
 int fpgaUnreset(void)
 {
-  palSetPadMode(IOPORT3, 1, PAL_MODE_OUTPUT_PUSHPULL);
   palSetPad(IOPORT3, 1); // MCU_F_PROG
+  palSetPadMode(IOPORT3, 1, PAL_MODE_OUTPUT_PUSHPULL);
   return 0;
 }
