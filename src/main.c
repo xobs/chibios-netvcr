@@ -67,6 +67,18 @@ int main(void) {
   halInit();
   chSysInit();
 
+  // IOPORT1 = PORTA, IOPORT2 = PORTB, etc...
+  palClearPad(IOPORT1, 4);    // white LED, active low
+  palClearPad(IOPORT3, 3);    // MCU_F_MODE, set to 0, specifies SPI mode. Clear to 0 for SPI.
+
+  /* Connect the FPGA to the SPINOR */
+  fpgaConnect();
+
+  /*
+   * Activates the EXT driver 1.
+   */
+  extStart(&EXTD1, &extcfg);
+
   shellInit();
 
   /*
@@ -84,15 +96,6 @@ int main(void) {
   chThdSleepMilliseconds(1000);
   usbStart(serusbcfg.usbp, &usbcfg);
   usbConnectBus(serusbcfg.usbp);
-
-  // IOPORT1 = PORTA, IOPORT2 = PORTB, etc...
-  palClearPad(IOPORT1, 4);    // white LED, active low
-  palClearPad(IOPORT3, 3);    // MCU_F_MODE, set to 0, specifies SPI mode. Clear to 0 for SPI.
-
-  /*
-   * Activates the EXT driver 1.
-   */
-  extStart(&EXTD1, &extcfg);
 
   /*
    * Normal main() thread activity, spawning shells.
