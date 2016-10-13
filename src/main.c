@@ -23,7 +23,7 @@
 #include "usbcfg.h"
 #include "spinor.h"
 
-#define MAX_RETRIES 3000
+#define SPI_TIMEOUT MS2ST(3000)
 
 extern const char *gitversion;
 
@@ -165,13 +165,13 @@ int spiConfigure(SPIDriver *spip) {
   spiSend(spip, 2, seq);
   spiUnselect(spip);
 
-  int get_status_tries = 0;
-  while ((spinorGetStatus(spip) & 0x01) && (get_status_tries < MAX_RETRIES)) {
-    get_status_tries++;
-    chThdSleepMilliseconds(1);
+  int start_time = chVTGetSystemTimeX();
+  int sleep_msecs = 1;
+  while (spinorGetStatus(spip) & 0x01) {
+    if (chVTTimeElapsedSinceX(start_time) > SPI_TIMEOUT)
+      return MSG_TIMEOUT;
+    chThdSleepMilliseconds(sleep_msecs += 5);
   }
-  if (get_status_tries >= MAX_RETRIES)
-    return 1;
 
   return 0;
 }
