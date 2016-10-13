@@ -1,0 +1,8 @@
+[submodule "ChibiOS"]
+	path = ChibiOS
+	url = https://github.com/xobs/ChibiOS.git
+	branch = netv2
+[submodule "ChibiOS-Contrib"]
+	path = ChibiOS-Contrib
+	url = https://github.com/xobs/ChibiOS-Contrib.git
+	branch = netv2
