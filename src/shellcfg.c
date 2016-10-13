@@ -44,9 +44,11 @@ char *completion_buffer[SHELL_MAX_COMPLETIONS];
  * Shell commands
  */
 void handleUpload(BaseSequentialStream *chp, int argc, char *argv[]);
+void spinorCommand(BaseSequentialStream *chp, int argc, char *argv[]);
 
 static const ShellCommand commands[] = {
   {"upload", handleUpload},
+  {"spinor", spinorCommand},
   {NULL, NULL}
 };
 

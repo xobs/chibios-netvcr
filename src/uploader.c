@@ -4,9 +4,6 @@
 #include "fpga.h"
 #include "usbcfg.h"
 
-extern void spiConfigure(SPIDriver *spip);
-extern void spiDeconfigure(SPIDriver *spip);
-
 #define driver &SDU1
 
 #define SPIDEV &SPID1
@@ -125,8 +122,12 @@ void handleUpload(BaseSequentialStream *chp, int argc, char *argv[])
   fpgaDisconnect();
 
   /* 2. MCU configures drive on SPI pins */
-  chprintf(chp, "Configuring SPI...\r\n");
-  spiConfigure(SPIDEV);
+  chprintf(chp, "Configuring SPI...: ");
+  if (spiConfigure(SPIDEV)) {
+    chprintf(chp, "Error: Couldn't configure SPI\r\n");
+    goto out;
+  }
+  chprintf(chp, "Ok\r\n");
 
   chprintf(chp, "Erasing SPINOR...\r\n");
   spinorEraseChip(SPIDEV);
@@ -175,15 +176,19 @@ void handleUpload(BaseSequentialStream *chp, int argc, char *argv[])
       spi_data_count = 0;
     }
   }
+  chprintf(chp, "Done.\r\n");
 
+out:
   /* 4. MCU tri-states its SPI pins */
   chprintf(chp, "Deconfiguring SPI...\r\n");
   spiDeconfigure(SPIDEV);
 
   /* 5. MCU re-connects FPGA by asserting FPGA_DRIVE */
-  chprintf(chp, "Reconnecting FPGA...\r\n");
-  fpgaConnect();
+  chprintf(chp, "Reconnecting FPGA: ");
+  if (fpgaConnect())
+    chprintf(chp, "Error\r\n");
+  else
+    chprintf(chp, "Ok\r\n");
 
-  chprintf(chp, "Done.\r\n");
   return;
 }

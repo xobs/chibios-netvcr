@@ -23,6 +23,8 @@
 #include "usbcfg.h"
 #include "spinor.h"
 
+#define MAX_RETRIES 3000
+
 extern const char *gitversion;
 
 static uint8_t done_state = 0;
@@ -98,7 +100,7 @@ int main(void) {
   while (true) {
     if (SDU1.config->usbp->state == USB_ACTIVE) {
       /* Slight delay to wait for CDC to attach */
-      osalThreadSleepMilliseconds(100);
+      osalThreadSleepMilliseconds(500);
       chprintf(stream, SHELL_NEWLINE_STR SHELL_NEWLINE_STR);
       chprintf(stream, "NeTVCR bootloader.  Based on build %s"SHELL_NEWLINE_STR,
                gitversion);
@@ -127,7 +129,7 @@ int main(void) {
     SPIx_CTARn_DT(0x1)
 #define KINETIS_SPI_TAR_8BIT_NOT_AS_FAST   KINETIS_SPI_TAR_SYSCLK_DIV_4(8)
 
-void spiConfigure(SPIDriver *spip) {
+int spiConfigure(SPIDriver *spip) {
   static const SPIConfig spinor_config = {
     NULL,
     /* HW dependent part.*/
@@ -162,11 +164,19 @@ void spiConfigure(SPIDriver *spip) {
   spiSelect(spip);
   spiSend(spip, 2, seq);
   spiUnselect(spip);
-  while (spinorGetStatus(spip) & 0x01)
+
+  int get_status_tries = 0;
+  while ((spinorGetStatus(spip) & 0x01) && (get_status_tries < MAX_RETRIES)) {
+    get_status_tries++;
     chThdSleepMilliseconds(1);
+  }
+  if (get_status_tries >= MAX_RETRIES)
+    return 1;
+
+  return 0;
 }
 
-void spiDeconfigure(SPIDriver *spip) {
+int spiDeconfigure(SPIDriver *spip) {
   spiStop(spip);
   palSetPadMode(IOPORT3, 4, PAL_MODE_INPUT);
   palSetPadMode(IOPORT3, 5, PAL_MODE_INPUT);
@@ -174,4 +184,6 @@ void spiDeconfigure(SPIDriver *spip) {
   palSetPadMode(IOPORT3, 7, PAL_MODE_INPUT);
 
   palSetPadMode(IOPORT2, 0, PAL_MODE_INPUT); // FPGA_DRIVE, let it float up
+
+  return 0;
 }

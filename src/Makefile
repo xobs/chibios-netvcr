@@ -128,9 +128,7 @@ CSRC = \
        $(SHELLSRC) \
        main.c \
        orchard-vectors.c \
-       orchard-shell.c \
        shellcfg.c \
-       program-dumb-rle.c \
        uploader.c \
        fpga.c \
        spinor.c \

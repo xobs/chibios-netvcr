@@ -4,6 +4,9 @@
 #include "hal.h"
 #include "spinor.h"
 
+uint8_t status_logs[16];
+static uint8_t status_log_ptr;
+
 uint8_t spinorGetStatus(SPIDriver *spip)
 {
   uint8_t cmd = 0x05;
@@ -22,7 +25,49 @@ uint8_t spinorGetStatus(SPIDriver *spip)
   spiUnselect(spip);
   */
 
+  status_logs[status_log_ptr++] = val[0];
+  status_log_ptr &= 0xf;
+
   return val[0];
+}
+
+uint32_t spinorReadDeviceId(SPIDriver *spip)
+{
+
+  uint8_t cmd = 0xab;
+  uint32_t val;
+
+  spiSelect(spip);
+  spiSend(spip, 1, &cmd);
+  spiReceive(spip, 4, &val);
+  spiUnselect(spip);
+  return val;
+}
+
+uint32_t spinorReadElectronicSignature(SPIDriver *spip)
+{
+
+  uint8_t cmd[] = {0xab, 0x00, 0x00, 0x00};
+  uint32_t val;
+
+  spiSelect(spip);
+  spiSend(spip, sizeof(cmd), cmd);
+  spiReceive(spip, 4, &val);
+  spiUnselect(spip);
+  return val;
+}
+
+uint32_t spinorReadDeviceIdType(SPIDriver *spip, uint8_t id)
+{
+
+  uint8_t cmd[] = {0x90, 0x00, 0x00, id};
+  uint32_t val;
+
+  spiSelect(spip);
+  spiSend(spip, 1, &cmd);
+  spiReceive(spip, 4, &val);
+  spiUnselect(spip);
+  return val;
 }
 
 void spinorEnableWrite(SPIDriver *spip)
