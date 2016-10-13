@@ -30,7 +30,7 @@ void fpgaCommand(BaseSequentialStream *chp, int argc, char *argv[])
     }
 
     /* Let the FPGA think about things for a while, in reset */
-    chThdSleepMilliseconds(1);
+    chThdSleepMilliseconds(10);
 
     if (fpgaUnreset()) {
       chprintf(chp, "Unable to un-reset"SHELL_NEWLINE_STR);
