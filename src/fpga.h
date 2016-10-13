@@ -4,5 +4,7 @@
 int fpgaProgrammed(void);
 int fpgaConnect(void);
 int fpgaDisconnect(void);
+int fpgaReset(void);
+int fpgaUnreset(void);
 
 #endif /* __FPGA_H__ */
