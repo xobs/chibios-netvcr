@@ -24,16 +24,16 @@ void fpgaCommand(BaseSequentialStream *chp, int argc, char *argv[])
   if (!strcasecmp(argv[0], "cycle")) {
     chprintf(chp, "Power-cycling FPGA: ");
 
-    if (fpgaDisconnect()) {
-      chprintf(chp, "Unable to disconnect"SHELL_NEWLINE_STR);
+    if (fpgaReset()) {
+      chprintf(chp, "Unable to reset"SHELL_NEWLINE_STR);
       return;
     }
 
     /* Let the FPGA think about things for a while, in reset */
     chThdSleepMilliseconds(1);
 
-    if (fpgaConnect()) {
-      chprintf(chp, "Unable to reconnect"SHELL_NEWLINE_STR);
+    if (fpgaUnreset()) {
+      chprintf(chp, "Unable to un-reset"SHELL_NEWLINE_STR);
       return;
     }
 
