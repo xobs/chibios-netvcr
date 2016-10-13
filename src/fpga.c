@@ -16,19 +16,20 @@ int fpgaConnect(void)
   palSetPadMode(IOPORT3, 6, PAL_MODE_INPUT);
   palSetPadMode(IOPORT3, 7, PAL_MODE_INPUT);
 
-  /* Assert FPGA_DRIVE to move the SPI to the FPGA */
-  palSetPad(IOPORT2, 0);
+  /* Let FPGA_DRIVE float up, to move the SPI to the FPGA */
+  palSetPadMode(IOPORT2, 0, PAL_MODE_INPUT);
   chThdSleepMilliseconds(1);
 
   /* Set FPGA_INIT as an input, to allow it to float */
   palSetPadMode(IOPORT2, 1, PAL_MODE_INPUT);
 
-  /* Put the FPGA into reset */
+  /* Reset (then un-reset) the FPGA */
   palSetPadMode(IOPORT3, 1, PAL_MODE_OUTPUT_PUSHPULL);
   palClearPad(IOPORT3, 1); // MCU_F_PROG
   chThdSleepMicroseconds(50);
   palSetPad(IOPORT3, 1); // MCU_F_PROG
 
+  /* Wait for it to program itself */
   int start_time = chVTGetSystemTimeX();
   int sleep_msecs = 1;
   while (!fpgaProgrammed()) {
@@ -44,6 +45,7 @@ int fpgaConnect(void)
 int fpgaDisconnect(void)
 {
   /* Deassert FPGA_DRIVE to move the SPI to the MCU */
+  palSetPadMode(IOPORT2, 0, PAL_MODE_OUTPUT_PUSHPULL);
   palClearPad(IOPORT2, 0);
   chThdSleepMilliseconds(1);
 
