@@ -21,6 +21,7 @@
 #include "shell.h"
 
 #include "usbcfg.h"
+#include "spinor.h"
 
 extern const char *gitversion;
 
