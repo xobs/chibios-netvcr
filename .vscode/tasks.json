@@ -4,18 +4,41 @@
     "version": "0.1.0",
     "command": "mingw32-make.exe",
     "isShellCommand": true,
-    "isBuildCommand": true,
-    "args": ["-C", "src/", "TRGT=arm-none-eabi-"],
     "showOutput": "always",
-    "problemMatcher": {
-        "fileLocation": ["relative", "${workspaceRoot}/src"],
-        "pattern": {
-            "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
-            "file": 1,
-            "line": 2,
-            "column": 3,
-            "severity": 4,
-            "message": 5
+    "suppressTaskName": true,
+    "echoCommand": true,
+    "tasks": [
+        {
+            "taskName": "build",
+            "args": ["-C", "src/", "TRGT=arm-none-eabi-", "-j4"],
+            "isWatching": false,
+            "isBuildCommand": true,
+
+            "problemMatcher": [
+                {
+                    "owner": "c",
+                    "fileLocation": ["relative", "${workspaceRoot}/src"],
+                    "pattern": {
+                        "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3,
+                        "severity": 4,
+                        "message": 5
+                    }
+                },
+                {
+                    "owner": "c",
+                    "fileLocation": ["absolute"],
+                    "severity": "error",
+                    "pattern": {
+                        "regexp": "^(.*):(\\d+):\\s+(.*)$",
+                        "file": 1,
+                        "line": 2,
+                        "message": 3
+                    }
+                }
+            ]
         }
-    }
+    ]
 }

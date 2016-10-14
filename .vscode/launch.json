@@ -5,7 +5,11 @@
             "name": "C++ Attach",
             "type": "cppdbg",
             "request": "launch",
-            "args": ["target remote xobs-swd.local:3333"],
+            "args": [
+                "-ex", "target remote xobs-swd.local:3333",
+                "-ex", "kx.cpu configure -rtos ChibiOS",
+                "-ex", "load"
+            ],
             "program": "${workspaceRoot}/src/build/netvcr.elf",
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}/src",
