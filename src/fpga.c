@@ -18,24 +18,13 @@ void fpgaConnect(void)
   palSetPad(IOPORT2, 0);
   chThdSleepMilliseconds(1);
 
-  palSetPad(IOPORT1, 4);  // LED off
-  chThdSleepMilliseconds(250);
-  palClearPad(IOPORT1, 4); // LED on
-  chThdSleepMilliseconds(500);
-  palSetPad(IOPORT1, 4);  // LED off
-  chThdSleepMilliseconds(250);
-  palClearPad(IOPORT1, 4); // LED on
-  chThdSleepMilliseconds(500);
-  palSetPad(IOPORT1, 4);  // LED off
-  /* Now reset the FPGA */
-
   /* Set FPGA_INIT as an input, to allow it to float */
   palSetPadMode(IOPORT2, 1, PAL_MODE_INPUT);
 
   /* Put the FPGA into reset */
+  palSetPadMode(IOPORT3, 1, PAL_MODE_OUTPUT_PUSHPULL);
   palClearPad(IOPORT3, 1); // MCU_F_PROG
   chThdSleepMicroseconds(50);
-  //chThdSleepMilliseconds(50);
   palSetPad(IOPORT3, 1); // MCU_F_PROG
 
   while (!fpgaProgrammed())

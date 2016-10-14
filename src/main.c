@@ -88,19 +88,10 @@ int main(void) {
   // IOPORT1 = PORTA, IOPORT2 = PORTB, etc...
   palClearPad(IOPORT1, 4);    // white LED, active low
   palClearPad(IOPORT3, 3);    // MCU_F_MODE, set to 0, specifies SPI mode. Clear to 0 for SPI.
-  palSetPad(IOPORT2, 0);    // FPGA_DRIVE, normally enable FPGA to drive the SPI bus
-  palSetPad(IOPORT3, 1);    // MCU_F_PROG, set PROG high, pulse low to reset the FPGA
-
-  // pulse PROG now that the Mode pin has been setup
-  chThdSleepMilliseconds(1);
-  palClearPad(IOPORT3, 1);    // MCU_F_PROG, set PROG high, pulse low to reset the FPGA (min width = 250ns)
-  chThdSleepMilliseconds(1);
-  palSetPad(IOPORT3, 1);
 
   /*
    * Activates the EXT driver 1.
    */
-  palSetPadMode(IOPORT3, 2, PAL_MODE_INPUT_PULLUP);  // FPGA done
   extStart(&EXTD1, &extcfg);
 
   /*
@@ -131,6 +122,9 @@ void spiConfigure(SPIDriver *spip) {
     4,
     KINETIS_SPI_TAR_8BIT_SLOW
   };
+
+  palSetPadMode(IOPORT2, 0, PAL_MODE_OUTPUT_PUSHPULL); // FPGA_DRIVE, send it low
+  palSetPad(IOPORT2, 0);                               // FPGA_DRIVE, normally enable FPGA to drive the SPI bus
 
 #warning "Figure out why we need this, and why PCS doesn't work."
   palSetPadMode(IOPORT3, 4, PAL_MODE_OUTPUT_PUSHPULL);
@@ -165,4 +159,6 @@ void spiDeconfigure(SPIDriver *spip) {
   palSetPadMode(IOPORT3, 5, PAL_MODE_INPUT);
   palSetPadMode(IOPORT3, 6, PAL_MODE_INPUT);
   palSetPadMode(IOPORT3, 7, PAL_MODE_INPUT);
+
+  palSetPadMode(IOPORT2, 0, PAL_MODE_INPUT); // FPGA_DRIVE, let it float up
 }
