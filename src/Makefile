@@ -5,7 +5,7 @@
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
-  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16 -nostdlib -mfloat-abi=soft -mfp16-format=none
+  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16 -nostdlib -mfloat-abi=soft -mfp16-format=none -DSHELL_CONFIG_FILE
 endif
 
 # C specific options here (added to USE_OPT).
@@ -124,13 +124,16 @@ CSRC = \
        $(HALSRC) \
        $(PLATFORMSRC) \
        $(BOARDSRC) \
-       $(TESTSRC) \
        $(STREAMSSRC) \
        $(SHELLSRC) \
        main.c \
        orchard-vectors.c \
        orchard-shell.c \
+       shellcfg.c \
        program-dumb-rle.c \
+       uploader.c \
+       fpga.c \
+       spinor.c \
        gitversion.c \
        $(wildcard cmd-*.c) \
 

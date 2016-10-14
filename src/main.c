@@ -17,6 +17,7 @@
 #include "hal.h"
 
 #include "chprintf.h"
+#include "shellcfg.h"
 #include "shell.h"
 
 #include "usbcfg.h"
@@ -47,15 +48,6 @@ extern void programDumbRleFile(void);
 #define SHELL_WA_SIZE   THD_WORKING_AREA_SIZE(2048)
 
 #define stream (BaseSequentialStream *)&SDU1
-
-static const ShellCommand commands[] = {
-  {NULL, NULL}
-};
-
-static const ShellConfig shell_cfg1 = {
-  stream,
-  commands
-};
 
 /*
  * Application entry point.
@@ -118,7 +110,7 @@ int main(void) {
     if (SDU1.config->usbp->state == USB_ACTIVE) {
       thread_t *shelltp = chThdCreateFromHeap(NULL, SHELL_WA_SIZE,
                                               "shell", NORMALPRIO + 1,
-                                              shellThread, (void *)&shell_cfg1);
+                                              shellThread, (void *)&shell_cfg);
       chThdWait(shelltp);               /* Waiting termination.             */
     }
     chThdSleepMilliseconds(1000);
@@ -129,4 +121,48 @@ int main(void) {
     if (done_state)
       palTogglePad(IOPORT1, 4);
   }
+}
+
+void spiConfigure(SPIDriver *spip) {
+  static const SPIConfig spinor_config = {
+    NULL,
+    /* HW dependent part.*/
+    GPIOC,
+    4,
+    KINETIS_SPI_TAR_8BIT_SLOW
+  };
+
+#warning "Figure out why we need this, and why PCS doesn't work."
+  palSetPadMode(IOPORT3, 4, PAL_MODE_OUTPUT_PUSHPULL);
+//  palSetPadMode(IOPORT3, 4, PAL_MODE_ALTERNATIVE_2);
+  palSetPadMode(IOPORT3, 5, PAL_MODE_ALTERNATIVE_2);
+  palSetPadMode(IOPORT3, 6, PAL_MODE_ALTERNATIVE_2);
+  palSetPadMode(IOPORT3, 7, PAL_MODE_ALTERNATIVE_2);
+  spiStart(spip, &spinor_config);
+
+  /*
+   * This seems to be required to get communication to work.
+   * Send a dummy byte down the wire, since the first packet is ignored.
+   */
+#warning "Figure out why this dummy byte is needed"
+  spiSelect(spip);
+  uint8_t dummy = 0xff;
+  spiSend(spip, 1, &dummy);
+  spiUnselect(spip);
+
+  spinorEnableWrite(spip);
+  uint8_t seq[4] = {0x01, 0x00, 0x00, 0x00};
+  spiSelect(spip);
+  spiSend(spip, 2, seq);
+  spiUnselect(spip);
+  while (spinorGetStatus(spip) & 0x01)
+    chThdSleepMilliseconds(1);
+}
+
+void spiDeconfigure(SPIDriver *spip) {
+  spiStop(spip);
+  palSetPadMode(IOPORT3, 4, PAL_MODE_INPUT);
+  palSetPadMode(IOPORT3, 5, PAL_MODE_INPUT);
+  palSetPadMode(IOPORT3, 6, PAL_MODE_INPUT);
+  palSetPadMode(IOPORT3, 7, PAL_MODE_INPUT);
 }
